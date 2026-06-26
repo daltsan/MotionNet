@@ -19,7 +19,7 @@ def vis_carmen_data(data_dir, model_path, img_save_dir):
     print("Loading model...")
     model = MotionNet(out_seq_len=20, motion_category_num=2, height_feat_size=13)
     model = nn.DataParallel(model)
-    checkpoint = torch.load(model_path)
+    checkpoint = torch.load(model_path, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
     model = model.to(device)
     model.eval()
