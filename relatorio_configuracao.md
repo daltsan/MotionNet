@@ -13,18 +13,31 @@ Este documento descreve detalhadamente a configuração do ambiente, o fluxo de 
 
 ## 2. Configuração do Ambiente (Virtual Environment)
 
-Para rodar o projeto e evitar conflitos de dependências, foi criado um ambiente virtual Python (`venv`) no diretório raiz do projeto:
+Para rodar o projeto e evitar conflitos de dependências, o ambiente virtual Python (`venv`) deve ser criado e configurado localmente.
 
-* **Gerenciamento**: Python Virtual Environment (`venv`).
-* **Ativação do Ambiente**:
-  ```bash
-  source venv/bin/activate
-  ```
-* **Configuração de Variáveis de Ambiente**:
-  Para expor o pacote `MotionNet` e o kit de desenvolvimento do nuScenes, a variável `PYTHONPATH` precisa ser configurada no terminal:
-  ```bash
-  export PYTHONPATH=$(pwd)/MotionNet:$(pwd)/MotionNet/nuscenes-devkit/python-sdk
-  ```
+> [!NOTE]
+> Pastas de ambiente virtual (`venv/`) **não** são enviadas para o repositório Git. Elas contêm binários específicos do sistema operacional e caminhos absolutos locais que não funcionariam em outras máquinas. Em vez disso, as dependências necessárias estão salvas no arquivo `requirements.txt`.
+
+### Como recriar o ambiente em qualquer máquina:
+
+1. **Criar o ambiente virtual** (no diretório raiz):
+   ```bash
+   python3 -m venv venv
+   ```
+2. **Ativar o ambiente**:
+   ```bash
+   source venv/bin/activate
+   ```
+3. **Instalar todas as dependências**:
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+4. **Configuração de Variáveis de Ambiente**:
+   Para expor o pacote `MotionNet` e o kit de desenvolvimento do nuScenes, a variável `PYTHONPATH` precisa ser configurada no terminal:
+   ```bash
+   export PYTHONPATH=$(pwd)/MotionNet:$(pwd)/MotionNet/nuscenes-devkit/python-sdk
+   ```
 
 ### Principais Dependências Instaladas
 O ambiente virtual foi populado com as bibliotecas necessárias para deep learning (PyTorch), manipulação geométrica de nuvens de pontos e visualização:
