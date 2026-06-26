@@ -117,8 +117,11 @@ O fluxo de processamento funciona em duas etapas principais, conforme documentad
    PYTHONPATH=$(pwd)/MotionNet:$(pwd)/MotionNet/nuscenes-devkit/python-sdk \
    venv/bin/python MotionNet/test_carmen.py \
      --data_dir carmen-preprocessed-novo \
-     --img_save_dir carmen_results_novo
+     --img_save_dir carmen_results_novo \
+     --model_path /caminho/para/o/modelo/pre-treinado/model.pth
    ```
+   > [!NOTE]
+   > Os scripts não possuem mais caminhos absolutos engessados (hardcoded). Se você omitir o parâmetro `--model_path`, o sistema assumirá o caminho relativo padrão `../pre-tained-model/model.pth`. Se o seu arquivo de pesos estiver em outro diretório no novo computador, basta fornecê-lo via linha de comando como mostrado acima.
    *(Essa etapa gera os plots individuais de cada frame e compila o vídeo final `result.gif`)*.
 
 3. **Compilação de Vídeo MP4 (Opcional - via FFmpeg)**:
