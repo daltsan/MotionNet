@@ -249,7 +249,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--log', type=str, required=True, help='Path to CARMEN log txt file')
-    parser.add_argument('--out_dir', type=str, default='/home/davi/Ufes/robprob/carmen-preprocessed', help='Output directory for NPY files')
+    parser.add_argument('--out_dir', type=str, default='carmen-preprocessed', help='Output directory for NPY files')
     parser.add_argument('--max_frames', type=int, default=50, help='Max frames to process')
     args = parser.parse_args()
     

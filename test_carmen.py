@@ -133,9 +133,9 @@ def vis_carmen_data(data_dir, model_path, img_save_dir):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_dir', type=str, default='/home/davi/Ufes/robprob/carmen-preprocessed')
-    parser.add_argument('--model_path', type=str, default='/home/davi/Ufes/robprob/pre-tained-model/model.pth')
-    parser.add_argument('--img_save_dir', type=str, default='/home/davi/Ufes/robprob/carmen_results')
+    parser.add_argument('--data_dir', type=str, default='carmen-preprocessed')
+    parser.add_argument('--model_path', type=str, default='../pre-tained-model/model.pth', help='Relative or absolute path to the pretrained model')
+    parser.add_argument('--img_save_dir', type=str, default='carmen_results')
     args = parser.parse_args()
     
     vis_carmen_data(args.data_dir, args.model_path, args.img_save_dir)

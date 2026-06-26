@@ -60,7 +60,8 @@ def parse_carmen_pointcloud(file_path):
     return np.array(points, dtype=np.float32)
 
 if __name__ == '__main__':
-    pcd_file = '/home/davi/Ufes/robprob/log_volta_da_ufes_20230422-1/log_volta_da_ufes_20230422-1.txt_lidar/1682190000/1682192200/1682192236.498997.pointcloud'
+    import sys
+    pcd_file = sys.argv[1] if len(sys.argv) > 1 else 'example.pointcloud'
     pc = parse_carmen_pointcloud(pcd_file)
     print(f"Loaded {len(pc)} points")
     print("Sample points (x, y, z, intensity, ring):")
