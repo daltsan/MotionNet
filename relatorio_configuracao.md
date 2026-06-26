@@ -15,8 +15,6 @@ Este documento descreve detalhadamente a configuração do ambiente, o fluxo de 
 
 Para rodar o projeto e evitar conflitos de dependências, o ambiente virtual Python (`venv`) deve ser criado e configurado localmente.
 
-> [!NOTE]
-> Pastas de ambiente virtual (`venv/`) **não** são enviadas para o repositório Git. Elas contêm binários específicos do sistema operacional e caminhos absolutos locais que não funcionariam em outras máquinas. Em vez disso, as dependências necessárias estão salvas no arquivo `requirements.txt`.
 
 ### Como recriar o ambiente em qualquer máquina:
 
