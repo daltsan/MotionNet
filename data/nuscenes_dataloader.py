@@ -124,7 +124,7 @@ class TrainDatasetMultiSeq(Dataset):
             num_past_pcs = self.num_past_frames
             for i in range(num_past_pcs):
                 indices = gt_dict["voxel_indices_" + str(i)]
-                curr_voxels = np.zeros(dims, dtype=np.bool)
+                curr_voxels = np.zeros(dims, dtype=bool)
                 curr_voxels[indices[:, 0], indices[:, 1], indices[:, 2]] = 1
                 padded_voxel_points.append(curr_voxels)
             padded_voxel_points = np.stack(padded_voxel_points, 0).astype(np.float32)
@@ -266,7 +266,7 @@ class DatasetSingleSeq(Dataset):
         padded_voxel_points = list()
         for i in range(num_past_pcs):
             indices = gt_dict["voxel_indices_" + str(i)]
-            curr_voxels = np.zeros(dims, dtype=np.bool)
+            curr_voxels = np.zeros(dims, dtype=bool)
             curr_voxels[indices[:, 0], indices[:, 1], indices[:, 2]] = 1
             padded_voxel_points.append(curr_voxels)
         padded_voxel_points = np.stack(padded_voxel_points, 0).astype(np.float32)

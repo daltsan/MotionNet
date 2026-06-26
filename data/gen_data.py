@@ -26,7 +26,8 @@ parser.add_argument(
     type=str,
     help="Root path to nuScenes dataset",
 )
-parser.add_argument("-s", "--split", default="train", type=str, help="The data split [train/val/test]")
+parser.add_argument("-s", "--split", default="train", type=str, help="The data split [train/val/test/mini_train/mini_val]")
+parser.add_argument("-v", "--version", default="v1.0-trainval", type=str, help="Dataset version (e.g., v1.0-trainval, v1.0-mini)")
 parser.add_argument(
     "-p",
     "--savepath",
@@ -36,7 +37,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-nusc = NuScenes(version="v1.0-trainval", dataroot=args.root, verbose=True)
+nusc = NuScenes(version=args.version, dataroot=args.root, verbose=True)
 print("Total number of scenes:", len(nusc.scene))
 
 class_map = {
@@ -48,7 +49,7 @@ class_map = {
 }  # background: 0, other: 4
 
 
-if args.split == "train":
+if "train" in args.split:
     num_keyframe_skipped = 0  # The number of keyframes we will skip when dumping the data
     nsweeps_back = 30  # Number of frames back to the history (including the current timestamp)
     nsweeps_forward = 20  # Number of frames into the future (does not include the current timestamp)
@@ -72,15 +73,24 @@ future_frame_skip = 0  # when generating the BEV maps, how many future frames ne
 num_past_frames_for_bev_seq = 5  # the number of past frames for BEV map sequence
 
 
-scenes = np.load("data/split.npy", allow_pickle=True).item().get(args.split)
+if "mini" in args.split:
+    if args.split == "mini_val":
+        scenes = ["scene_103", "scene_1100"]
+    else:
+        scenes = ["scene_61", "scene_553", "scene_655", "scene_757", "scene_796", "scene_916", "scene_1077", "scene_1094"]
+else:
+    scenes = np.load("data/split.npy", allow_pickle=True).item().get(args.split)
 print("Split: {}, which contains {} scenes.".format(args.split, len(scenes)))
 
 # ---------------------- Extract the scenes, and then pre-process them into BEV maps ----------------------
 def gen_data():
     res_scenes = list()
     for s in scenes:
-        s_id = s.split("_")[1]
-        res_scenes.append(int(s_id))
+        scene_name = f"scene-{int(s.split('_')[1]):04d}"
+        for i, scene in enumerate(nusc.scene):
+            if scene['name'] == scene_name:
+                res_scenes.append(i)
+                break
 
     for scene_idx in res_scenes:
         curr_scene = nusc.scene[scene_idx]
@@ -347,7 +357,7 @@ def convert_to_dense_bev(data_dict):
 
     # Compile the batch of voxels, so that they can be fed into the network.
     # Note that, the padded_voxel_points in this script will only be used for sanity check.
-    padded_voxel_points = np.stack(padded_voxel_points_list, axis=0).astype(np.bool)
+    padded_voxel_points = np.stack(padded_voxel_points_list, axis=0).astype(bool)
 
     # Finally, generate the ground-truth displacement field
     # - all_disp_field_gt: the ground-truth displacement vectors for each grid cell
@@ -403,7 +413,7 @@ def convert_to_sparse_bev(dense_bev_data):
         save_trans_matrices,
     ) = dense_bev_data
 
-    save_valid_pixel_maps = save_valid_pixel_maps.astype(np.bool)
+    save_valid_pixel_maps = save_valid_pixel_maps.astype(bool)
     save_voxel_dims = save_voxel_points.shape[1:]
     num_categories = save_pixel_cat_maps.shape[-1]
 
@@ -433,7 +443,7 @@ def convert_to_sparse_bev(dense_bev_data):
     test_disp_field_gt[:, save_pixel_indices[:, 0], save_pixel_indices[:, 1], :] = sparse_disp_field_gt[:]
     assert np.all(test_disp_field_gt == save_disp_field_gt), "Error: Mismatch"
 
-    test_valid_pixel_maps = np.zeros((save_num_future_pcs, dims[0], dims[1]), dtype=np.bool)
+    test_valid_pixel_maps = np.zeros((save_num_future_pcs, dims[0], dims[1]), dtype=bool)
     test_valid_pixel_maps[:, save_pixel_indices[:, 0], save_pixel_indices[:, 1]] = sparse_valid_pixel_maps[:]
     assert np.all(test_valid_pixel_maps == save_valid_pixel_maps), "Error: Mismatch"
 
@@ -451,7 +461,7 @@ def convert_to_sparse_bev(dense_bev_data):
 
     for i in range(len(save_voxel_indices_list)):
         indices = save_data_dict["voxel_indices_" + str(i)]
-        curr_voxels = np.zeros(save_voxel_dims, dtype=np.bool)
+        curr_voxels = np.zeros(save_voxel_dims, dtype=bool)
         curr_voxels[indices[:, 0], indices[:, 1], indices[:, 2]] = 1
         assert np.all(curr_voxels == save_voxel_points[i]), "Error: Mismatch"
 

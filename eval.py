@@ -220,7 +220,7 @@ def eval_motion_displacement(
                 # Since in nuScenes (with 32-line LiDAR) the points (cells) in the distance are very sparse,
                 # we evaluate the performance for cells within the range [-30m, 30m] along both x, y dimensions.
                 border = 8
-                roi_mask = np.zeros_like(curr_mask, dtype=np.bool)
+                roi_mask = np.zeros_like(curr_mask, dtype=bool)
                 roi_mask[:, border:-border, border:-border] = True
                 curr_mask = np.logical_and(curr_mask, roi_mask)
 
@@ -242,11 +242,11 @@ def eval_motion_displacement(
         max_prob = np.amax(pixel_cat_map_gt_numpy, axis=-1)
         filter_mask = max_prob == 1.0  # Note: some of the cell probabilities are soft probabilities
         pixel_cat_map_numpy = np.argmax(pixel_cat_map_gt_numpy, axis=-1) + 1  # category starts from 1 (background), etc
-        pixel_cat_map_numpy = (pixel_cat_map_numpy * non_empty_map_numpy * filter_mask).astype(np.int)
+        pixel_cat_map_numpy = (pixel_cat_map_numpy * non_empty_map_numpy * filter_mask).astype(int)
 
         class_pred_numpy = np.transpose(class_pred_numpy, (0, 2, 3, 1))
         class_pred_numpy = np.argmax(class_pred_numpy, axis=-1) + 1
-        class_pred_numpy = (class_pred_numpy * non_empty_map_numpy * filter_mask).astype(np.int)
+        class_pred_numpy = (class_pred_numpy * non_empty_map_numpy * filter_mask).astype(int)
 
         border = 8
         roi_mask = np.zeros_like(non_empty_map_numpy)

@@ -400,7 +400,7 @@ def gen_2d_grid_gt_for_visualization(
     # Get the point cloud subsets, which are inside different instance bounding boxes
     refer_box_list = list()
     refer_pc_idx_per_bbox = list()
-    points_category = np.zeros(refer_pc.shape[0], dtype=np.int)  # store the point categories
+    points_category = np.zeros(refer_pc.shape[0], dtype=int)  # store the point categories
 
     for i in range(num_instances):
         instance_cat = instance_cat_list[i]
@@ -492,7 +492,7 @@ def gen_2d_grid_gt_for_visualization(
         disp_field = np.zeros([unique_indices.shape[0], 2], dtype=np.float32)  # we only consider the 2D field
 
         # We only compute loss for valid pixels where there are corresponding box annotations between two frames
-        valid_pixels = np.zeros(unique_indices.shape[0], dtype=np.bool)
+        valid_pixels = np.zeros(unique_indices.shape[0], dtype=bool)
 
         for h, v in enumerate(zip(unique_indices, num_points_in_pixel)):
 
@@ -680,10 +680,10 @@ def vis_model_per_sample_data(
     max_prob = np.amax(pixel_cat_map_gt, axis=-1)
     filter_mask = max_prob == 1.0
     pixel_cat_map = np.argmax(pixel_cat_map_gt, axis=-1) + 1  # category starts from 1 (background), etc
-    pixel_cat_map = (pixel_cat_map * non_empty_map * filter_mask).astype(np.int)
+    pixel_cat_map = (pixel_cat_map * non_empty_map * filter_mask).astype(int)
 
     cat_pred = np.argmax(cat_pred, axis=0) + 1
-    cat_pred = (cat_pred * non_empty_map * filter_mask).astype(np.int)
+    cat_pred = (cat_pred * non_empty_map * filter_mask).astype(int)
 
     # --- Visualization ---
     idx = num_past_pcs - 1

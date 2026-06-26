@@ -62,7 +62,7 @@ class MapMask:
         """
         px, py = self.to_pixel_coords(x, y)
 
-        on_mask = np.ones(px.size, dtype=np.bool)
+        on_mask = np.ones(px.size, dtype=bool)
         this_mask = self.mask(dilation)
 
         on_mask[px < 0] = False
