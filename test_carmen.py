@@ -4,7 +4,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import imageio
+from sklearn.cluster import DBSCAN
 
 from model import MotionNet
 from data.data_utils import voxelize_occupy
@@ -113,6 +115,43 @@ def vis_carmen_data(data_dir, model_path, img_save_dir):
             
             if len(X_pred) > 0:
                 ax[1].quiver(X_pred, Y_pred, U_pred, V_pred, angles="xy", scale_units="xy", scale=1, color=color_map[k])
+                
+                
+        # 3. Clustering & Object Trajectory Extraction (DBSCAN)
+        # Consideramos apenas células de foreground (classe > 1, pois bg=1) que estejam em movimento (norma > 0.4)
+        valid_mask = (cat_pred_class > 1) & (field_pred_norm > 0.4)
+        valid_x = idx_x[valid_mask]
+        valid_y = idx_y[valid_mask]
+        
+        if len(valid_x) > 0:
+            points = np.column_stack((valid_x, valid_y))
+            # eps=3.0 agrupa células que tenham até ~3 células de distância (0.75m a 1.2m dependendo da resolução)
+            db = DBSCAN(eps=3.0, min_samples=2).fit(points)
+            
+            for cluster_id in set(db.labels_):
+                if cluster_id == -1:
+                    continue  # Ignora ruídos detectados pelo DBSCAN
+                
+                cluster_mask = db.labels_ == cluster_id
+                cluster_pts = points[cluster_mask]
+                
+                min_x, min_y = cluster_pts.min(axis=0)
+                max_x, max_y = cluster_pts.max(axis=0)
+                
+                # Desenhar Bounding Box 2D ao redor do cluster
+                rect = patches.Rectangle((min_x, min_y), max_x - min_x, max_y - min_y,
+                                         fill=False, edgecolor='white', linewidth=1.5, linestyle='--')
+                ax[1].add_patch(rect)
+                
+                # Extrair a trajetória média (vetor médio das células do objeto)
+                cluster_u = field_pred[:, :, 0][valid_mask][cluster_mask].mean() / voxel_size[0]
+                cluster_v = field_pred[:, :, 1][valid_mask][cluster_mask].mean() / voxel_size[1]
+                
+                # Desenhar o vetor de deslocamento médio (trajetória do objeto como um todo)
+                center_x = (min_x + max_x) / 2
+                center_y = (min_y + max_y) / 2
+                ax[1].arrow(center_x, center_y, cluster_u, cluster_v, color='white',
+                            width=0.4, head_width=2.5, length_includes_head=True, zorder=10)
                 
         ax[1].set_xlim(border_pixel, field_pred.shape[0] - border_pixel)
         ax[1].set_ylim(border_pixel, field_pred.shape[1] - border_pixel)
