@@ -178,7 +178,7 @@ def get_bev(data_dict):
         padded_voxel_points_list.append(res)
     return np.stack(padded_voxel_points_list, axis=0).astype(bool)
 
-def process_carmen_log(log_path, output_dir, max_frames=50):
+def process_carmen_log(log_path, output_dir, max_frames=50, start_frame=0):
     os.makedirs(output_dir, exist_ok=True)
     
     lidar_frames, velocities = load_carmen_log(log_path)
@@ -195,8 +195,9 @@ def process_carmen_log(log_path, output_dir, max_frames=50):
     print(f"Generating BEV maps to {output_dir}")
     
     processed = 0
-    # Process each frame that has enough past sweeps
-    for i in range(nsweeps_back, len(lidar_frames)):
+    # Process each frame that has enough past sweeps, starting from start_frame
+    start_idx = max(nsweeps_back, start_frame)
+    for i in range(start_idx, len(lidar_frames)):
         if processed >= max_frames:
             break
             
@@ -251,6 +252,7 @@ if __name__ == '__main__':
     parser.add_argument('--log', type=str, required=True, help='Path to CARMEN log txt file')
     parser.add_argument('--out_dir', type=str, default='carmen-preprocessed', help='Output directory for NPY files')
     parser.add_argument('--max_frames', type=int, default=50, help='Max frames to process')
+    parser.add_argument('--start_frame', type=int, default=0, help='Starting frame index to skip uninteresting parts')
     args = parser.parse_args()
     
-    process_carmen_log(args.log, args.out_dir, max_frames=args.max_frames)
+    process_carmen_log(args.log, args.out_dir, max_frames=args.max_frames, start_frame=args.start_frame)

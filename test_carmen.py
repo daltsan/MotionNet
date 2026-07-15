@@ -140,7 +140,7 @@ def vis_carmen_data(data_dir, model_path, img_save_dir):
                 
                 # Desenhar Bounding Box 2D ao redor do cluster
                 rect = patches.Rectangle((min_x, min_y), max_x - min_x, max_y - min_y,
-                                         fill=False, edgecolor='white', linewidth=1.5, linestyle='--')
+                                         fill=False, edgecolor='green', linewidth=2.0, linestyle='-')
                 ax[1].add_patch(rect)
                 
                 # Extrair a trajetória média (vetor médio das células do objeto)
@@ -150,8 +150,8 @@ def vis_carmen_data(data_dir, model_path, img_save_dir):
                 # Desenhar o vetor de deslocamento médio (trajetória do objeto como um todo)
                 center_x = (min_x + max_x) / 2
                 center_y = (min_y + max_y) / 2
-                ax[1].arrow(center_x, center_y, cluster_u, cluster_v, color='white',
-                            width=0.4, head_width=2.5, length_includes_head=True, zorder=10)
+                ax[1].arrow(center_x, center_y, cluster_u, cluster_v, color='green',
+                            width=0.6, head_width=3.0, length_includes_head=True, zorder=10)
                 
         ax[1].set_xlim(border_pixel, field_pred.shape[0] - border_pixel)
         ax[1].set_ylim(border_pixel, field_pred.shape[1] - border_pixel)
