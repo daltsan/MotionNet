@@ -53,6 +53,32 @@ To visualize the results:
 - `data/nuscenes_dataloader.py` the dataloader for model training/validation/testing.
 - `nuscenes-devkit` this folder is based on the nuScenes official API, and modified to include many other utilities.
 
+## CARMEN-LCAD Integration
+
+This repository includes custom scripts to integrate MotionNet with the CARMEN-LCAD autonomous driving system using raw LiDAR pointclouds.
+
+1. **Data Preprocessing**:
+   Run the converter script to parse binary `.pointcloud` files and odometry into structured BEV `.npy` maps:
+   ```bash
+   venv/bin/python data/carmen_to_motionnet.py \
+     --log /path/to/carmen.txt \
+     --out_dir carmen-preprocessed \
+     --max_frames 100 \
+     --start_frame 4000
+   ```
+   *The `--start_frame` parameter can be used to skip uninteresting parts of the log.*
+
+2. **Inference & Object Clustering**:
+   Run the custom test script to perform inference, extract object trajectories, and generate `.png`/`.gif` visual results:
+   ```bash
+   PYTHONPATH=$(pwd):$(pwd)/nuscenes-devkit/python-sdk \
+   venv/bin/python test_carmen.py \
+     --data_dir carmen-preprocessed \
+     --img_save_dir carmen_results \
+     --model_path pre-tained-model/model.pth
+   ```
+   *This script automatically applies **DBSCAN clustering** on the dynamic cell predictions to group them into individual moving objects, drawing green bounding boxes and extracting a single unified trajectory vector for each object.*
+
 ## Citation
 
 If you use the software, please cite the following ([TR2020-068](https://merl.com/publications/TR2020-068)):
